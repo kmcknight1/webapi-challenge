@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { LinearProgress } from "@material-ui/core";
+import { LinearProgress, Button, TextField } from "@material-ui/core";
 
 import Project from "./Project";
 
 const Projects = props => {
   const [projects, setProjects] = useState([]);
   const [loaded, setLoaded] = useState(false);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
     axios
@@ -21,6 +23,17 @@ const Projects = props => {
       });
   }, []);
 
+  function addProject(body) {
+    axios
+      .post("http://localhost:5000/api/projects", body)
+      .then(res => {
+        console.log(res.data);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
+
   return (
     <div
       style={{
@@ -30,6 +43,36 @@ const Projects = props => {
         alignItems: "center"
       }}
     >
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          const body = { name, description };
+          addProject(body);
+          window.location.reload();
+        }}
+      >
+        <TextField
+          variant="outlined"
+          label="Project Name"
+          value={name}
+          onChange={e => {
+            setName(e.target.value);
+          }}
+        />
+        <TextField
+          variant="outlined"
+          label="Project Description"
+          value={description}
+          onChange={e => {
+            setDescription(e.target.value);
+          }}
+        />
+
+        <Button type="submit" variant="contained">
+          Create New Project
+        </Button>
+      </form>
+
       {loaded === false ? (
         <>
           <LinearProgress />
